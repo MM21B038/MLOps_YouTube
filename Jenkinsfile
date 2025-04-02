@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_ENV = "venv"
+        PYTHON_ENV = "python3"
         DVC_STORAGE_PATH = "E:/manav/dvc-storage"
     }
 
