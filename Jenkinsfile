@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PYTHON_ENV = "python3"
+        PYTHON_ENV = "venv"
         DVC_STORAGE_PATH = "E:/manav/dvc-storage"
     }
 
@@ -20,9 +20,9 @@ pipeline {
             steps {
                 script {
                     echo "Setting up Python environment..."
-                    sh '''
-                    python3 -m venv venv
-                    source venv/bin/activate
+                    bat '''
+                    python -m venv venv
+                    call venv\Scripts\activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install dvc mlflow
@@ -35,9 +35,9 @@ pipeline {
             steps {
                 script {
                     echo "Pulling data from local DVC storage..."
-                    sh '''
-                    source venv/bin/activate
-                    dvc remote add -d local_storage ${DVC_STORAGE_PATH} || echo "DVC storage already set"
+                    bat '''
+                    call venv\Scripts\activate
+                    dvc remote add -d local_storage %DVC_STORAGE_PATH% || echo "DVC storage already set"
                     dvc pull
                     '''
                 }
@@ -48,8 +48,8 @@ pipeline {
             steps {
                 script {
                     echo "Running data cleaning..."
-                    sh '''
-                    source venv/bin/activate
+                    bat '''
+                    call venv\Scripts\activate
                     dvc repro data_cleaning
                     '''
                 }
@@ -60,8 +60,8 @@ pipeline {
             steps {
                 script {
                     echo "Running feature engineering..."
-                    sh '''
-                    source venv/bin/activate
+                    bat '''
+                    call venv\Scripts\activate
                     dvc repro feature_engineering
                     '''
                 }
@@ -72,8 +72,8 @@ pipeline {
             steps {
                 script {
                     echo "Training the model..."
-                    sh '''
-                    source venv/bin/activate
+                    bat '''
+                    call venv\Scripts\activate
                     dvc repro model_training
                     '''
                 }
@@ -84,8 +84,8 @@ pipeline {
             steps {
                 script {
                     echo "Promoting the model..."
-                    sh '''
-                    source venv/bin/activate
+                    bat '''
+                    call venv\Scripts\activate
                     dvc repro promote_model
                     '''
                 }
@@ -96,11 +96,11 @@ pipeline {
             steps {
                 script {
                     echo "Committing updated DVC files..."
-                    sh '''
+                    bat '''
                     git config --global user.email "your-email@example.com"
                     git config --global user.name "Jenkins CI"
                     git add dvc.yaml dvc.lock
-                    git commit -m "Update DVC pipeline"
+                    git commit -m "Update DVC pipeline" || echo "No changes to commit"
                     git push origin main
                     '''
                 }
