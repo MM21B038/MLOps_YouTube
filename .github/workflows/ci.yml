@@ -50,20 +50,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      # Run the data cleaning, feature engineering, and model training
-      - name: Data cleaning
-        run: dvc run -n data_cleaning -d src/ml/data_cleaning.py -d data/raw/comments.csv -o data/processed/cleaned_comments.csv python src/ml/data_cleaning.py
-
-      - name: Feature engineering
-        run: dvc run -n feature_engineering -d src/ml/feature_engineering.py -d data/processed/cleaned_comments.csv -o data/processed/features.csv -o data/processed/sentence_embeddings.pt python src/ml/feature_engineering.py
-
-      - name: Model training
-        run: dvc run -n model_training -d src/ml/train.py -d data/processed/features.csv -d data/processed/sentence_embeddings.pt -o models/xg_model.pkl -o models/label_encoder.pkl -o mlruns/ python src/ml/train.py
-
-      # If the model is ready, promote it
-      - name: Promote model
-        run: dvc run -n promote_model -d models/xg_model.pkl -d models/label_encoder.pkl -d mlruns/ -o models/YouTube_Comment_Sentiment_Analysis/ python src/ml/promote_model.py
-
+      - name: Run DVC Pipeline
+        run: dvc repro
       # Commit the updated DVC files
       - name: Commit DVC files
         run: |
