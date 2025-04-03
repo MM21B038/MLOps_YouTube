@@ -1,0 +1,4 @@
+[core]
+    remote = myremotebucket
+['remote "myremotebucket"']
+    url = s3://dvcstoragemanav
