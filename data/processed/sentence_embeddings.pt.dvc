@@ -1,0 +1,5 @@
+outs:
+- md5: 15c02a7359ad5b056140716870759334
+  size: 21173464
+  hash: md5
+  path: sentence_embeddings.pt
