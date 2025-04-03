@@ -1,9 +1,5 @@
 pipeline {
     agent any
-    environment {
-        // You can add additional environment variables if needed.
-        PYTHON_VERSION = "3.13"  // Informational only, since 'python' should be Python 3.13.
-    }
     stages {
         stage('Checkout Code') {
             steps {
@@ -14,60 +10,62 @@ pipeline {
         stage('Set Up Python Environment') {
             steps {
                 echo "Setting up Python environment..."
-                sh '''
+                bat """
                 python -m pip install --upgrade pip
                 pip install -r requirements.txt
-                pip install dvc[all] mlflow
-                '''
+                pip install dvc mlflow
+                """
             }
         }
         stage('Pull DVC Data') {
             steps {
-                echo "Pulling DVC data..."
-                sh "dvc pull"
+                echo "Configuring DVC remote and pulling data..."
+                bat """
+                dvc remote add -d local_storage E:/manav/dvc-storage || echo DVC remote already set
+                dvc pull
+                """
+            }
+        }
+        stage('Data Ingestion') {
+            steps {
+                echo "Running data ingestion stage..."
+                bat "dvc repro data_ingestion"
             }
         }
         stage('Data Cleaning') {
             steps {
                 echo "Running data cleaning stage..."
-                // This replicates your GitHub Actions command for data cleaning.
-                sh '''
-                dvc run -n data_cleaning -d src/ml/data_cleaning.py -d data/raw/comments.csv -o data/processed/cleaned_comments.csv python src/ml/data_cleaning.py
-                '''
+                bat "dvc repro data_cleaning"
             }
         }
         stage('Feature Engineering') {
             steps {
                 echo "Running feature engineering stage..."
-                sh '''
-                dvc run -n feature_engineering -d src/ml/feature_engineering.py -d data/processed/cleaned_comments.csv -o data/processed/features.csv -o data/processed/sentence_embeddings.pt python src/ml/feature_engineering.py
-                '''
+                bat "dvc repro feature_engineering"
             }
         }
         stage('Model Training') {
             steps {
                 echo "Running model training stage..."
-                sh '''
-                dvc run -n model_training -d src/ml/train.py -d data/processed/features.csv -d data/processed/sentence_embeddings.pt -o models/xg_model.pkl -o models/label_encoder.pkl -o mlruns/ python src/ml/train.py
-                '''
+                bat "dvc repro train"
             }
         }
         stage('Promote Model') {
             steps {
                 echo "Running model promotion stage..."
-                sh '''
-                dvc run -n promote_model -d models/xg_model.pkl -d models/label_encoder.pkl -d mlruns/ -o models/YouTube_Comment_Sentiment_Analysis/ python src/ml/promote_model.py
-                '''
+                bat "dvc repro promote_model"
             }
         }
         stage('Commit & Push Changes') {
             steps {
                 echo "Committing and pushing updated DVC files..."
-                sh '''
+                bat """
+                git config --global user.email "your-email@example.com"
+                git config --global user.name "Jenkins CI"
                 git add dvc.yaml dvc.lock
-                git commit -m "Update DVC pipeline" || echo "No changes to commit"
+                git commit -m "Update DVC pipeline" || echo No changes to commit
                 git push origin main
-                '''
+                """
             }
         }
     }
