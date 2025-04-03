@@ -19,9 +19,7 @@ This project performs sentiment analysis on YouTube comments using natural langu
 │   ├── processed          # Cleaned data and extracted features
 │
 ├── models                 # Trained machine learning models
-│   ├── xg_model.pkl       # XGBoost trained model
-│   ├── label_encoder.pkl  # Label encoder for sentiment labels
-│
+│   
 ├── src
 │   ├── ml
 │   │   ├── data_cleaning.py        # Data preprocessing
@@ -29,9 +27,8 @@ This project performs sentiment analysis on YouTube comments using natural langu
 │   │   ├── train.py                # Model training
 │   │   ├── promote_model.py        # Model promotion
 │   │   ├── inference.py            # Model inference for API
-│
-├── api
-│   ├── app.py              # FastAPI application for serving predictions
+│   ├── api
+│       ├── app.py              # FastAPI application for serving predictions
 │
 ├── mlruns                 # MLflow tracking
 ├── dvc.yaml               # DVC pipeline configuration
