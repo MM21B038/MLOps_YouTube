@@ -22,7 +22,7 @@ pipeline {
                     echo "Setting up Python environment..."
                     bat '''
                     python -m venv venv
-                    call venv\Scripts\activate
+                    call venv/Scripts/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install dvc mlflow
@@ -36,8 +36,8 @@ pipeline {
                 script {
                     echo "Pulling data from local DVC storage..."
                     bat '''
-                    call venv\Scripts\activate
-                    dvc remote add -d local_storage %DVC_STORAGE_PATH% || echo "DVC storage already set"
+                    call venv/Scripts/activate
+                    dvc remote add -d local_storage ${DVC_STORAGE_PATH} || echo "DVC storage already set"
                     dvc pull
                     '''
                 }
@@ -49,7 +49,7 @@ pipeline {
                 script {
                     echo "Running data cleaning..."
                     bat '''
-                    call venv\Scripts\activate
+                    call venv/Scripts/activate
                     dvc repro data_cleaning
                     '''
                 }
@@ -61,7 +61,7 @@ pipeline {
                 script {
                     echo "Running feature engineering..."
                     bat '''
-                    call venv\Scripts\activate
+                    call venv/Scripts/activate
                     dvc repro feature_engineering
                     '''
                 }
@@ -73,7 +73,7 @@ pipeline {
                 script {
                     echo "Training the model..."
                     bat '''
-                    call venv\Scripts\activate
+                    call venv/Scripts/activate
                     dvc repro model_training
                     '''
                 }
@@ -85,7 +85,7 @@ pipeline {
                 script {
                     echo "Promoting the model..."
                     bat '''
-                    call venv\Scripts\activate
+                    call venv/Scripts/activate
                     dvc repro promote_model
                     '''
                 }
