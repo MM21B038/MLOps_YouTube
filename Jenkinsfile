@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         // You can add additional environment variables if needed.
-        // PYTHON_VERSION = "3.13"  // Informational only, since 'python' should be Python 3.13.
+        PYTHON_VERSION = "3.13"  // Informational only, since 'python' should be Python 3.13.
     }
     stages {
         stage('Checkout Code') {
