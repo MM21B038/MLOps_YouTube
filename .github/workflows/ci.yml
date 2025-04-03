@@ -29,15 +29,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Install DVC and MLflow
-      - name: Install DVC and MLflow
+      # Install DVC, DVC-S3, and MLflow
+      - name: Install DVC, DVC-S3, and MLflow
         run: |
-          pip install dvc[all] mlflow
+          pip install dvc[all] dvc-s3 boto3 mlflow
 
-      # Pull DVC data (if necessary)
+      # Configure AWS credentials for DVC
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Pull DVC data from S3
       - name: Pull DVC data
-        run: |
-          dvc pull
+        run: dvc pull
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       # Run the data cleaning, feature engineering, and model training
       - name: Data cleaning
